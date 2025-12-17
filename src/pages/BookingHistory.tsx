@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     Plane,
-    Calendar,
     Users,
     Clock,
     MapPin,
@@ -146,7 +145,7 @@ const BookingHistory = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-6 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 py-6 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="mb-8">
@@ -224,7 +223,7 @@ const BookingHistory = () => {
                                     {/* Booking Header */}
                                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 pb-4 border-b border-gray-100">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                                            <div className="w-12 h-12 bg-linear-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shrink-0">
                                                 <Plane className="w-6 h-6 text-white" />
                                             </div>
                                             <div>
@@ -246,7 +245,7 @@ const BookingHistory = () => {
                                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4">
                                         {/* Airline */}
                                         <div className="lg:col-span-3 flex items-center gap-3">
-                                            <div className="w-14 h-14 bg-white border border-gray-200 rounded-xl flex items-center justify-center p-2 flex-shrink-0">
+                                            <div className="w-14 h-14 bg-white border border-gray-200 rounded-xl flex items-center justify-center p-2 shrink-0">
                                                 <img
                                                     src={booking.flight.airlineLogo}
                                                     alt={booking.flight.airline}
@@ -320,7 +319,7 @@ const BookingHistory = () => {
                                             </span>
                                         </div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                                            {booking.passengers.map((passenger, index) => (
+                                            {booking.passengers.map((passenger) => (
                                                 <div
                                                     key={passenger.id}
                                                     className="bg-white rounded-lg px-3 py-2 border border-gray-200"

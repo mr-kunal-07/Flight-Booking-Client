@@ -2,7 +2,6 @@ import { Route, Routes, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { PublicRoute } from "./components/PublicRoute";
 import Login from "./pages/Login";
-import FlightSearch from "./pages/FlightSearch";
 import LandingPage from "./pages/LandingPage";
 import Home from "./pages/Home";
 import Register from "./pages/Register";

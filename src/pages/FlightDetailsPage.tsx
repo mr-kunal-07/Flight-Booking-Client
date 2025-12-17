@@ -3,22 +3,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
     ArrowLeft,
     Plane,
-    Calendar,
-    Clock,
-    Users,
-    Shield,
-    Wifi,
-    Coffee,
     Luggage,
-    ShoppingCart,
-    Tag,
-    CheckCircle,
     AlertCircle,
-    Info,
     Loader2,
-    X,
-    Timer,
-    Building2,
 } from "lucide-react";
 
 interface FlightDetails {
@@ -34,11 +21,6 @@ interface FlightDetails {
     price: string;
     availableSeats: number;
     totalSeats: number;
-}
-
-interface CancellationPolicy {
-    timeRange: string;
-    penalty: string;
 }
 
 const FlightDetailsPage = () => {
@@ -121,7 +103,7 @@ const FlightDetailsPage = () => {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
-            <header className="bg-gradient-to-r from-blue-900 to-blue-800 text-white sticky top-0 z-40 shadow-lg">
+            <header className="bg-linear-to-r from-blue-900 to-blue-800 text-white sticky top-0 z-40 shadow-lg">
                 <div className="max-w-6xl mx-auto px-4 py-4">
                     <div className="flex items-center gap-4 mb-3">
                         <button
@@ -149,7 +131,7 @@ const FlightDetailsPage = () => {
                         {/* Flight Info Card */}
                         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                             {/* Route Header */}
-                            <div className="bg-gradient-to-r from-green-50 to-blue-50 px-6 py-4 border-b border-gray-200">
+                            <div className="bg-linear-to-r from-green-50 to-blue-50 px-6 py-4 border-b border-gray-200">
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <h2 className="text-xl font-bold text-gray-900">
@@ -178,7 +160,7 @@ const FlightDetailsPage = () => {
                             <div className="p-6">
                                 <div className="flex items-start gap-4">
                                     {/* Airline Logo */}
-                                    <div className="w-12 h-12 bg-white border border-gray-200 rounded-lg flex items-center justify-center p-2 flex-shrink-0">
+                                    <div className="w-12 h-12 bg-white border border-gray-200 rounded-lg flex items-center justify-center p-2 shrink-0">
                                         <img
                                             src={flight.airlineLogo}
                                             alt={flight.airline}
@@ -256,7 +238,7 @@ const FlightDetailsPage = () => {
 
                                         {/* Extra Baggage */}
                                         <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center gap-2">
-                                            <Luggage className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                                            <Luggage className="w-5 h-5 text-blue-600 shrink-0" />
                                             <div className="text-sm text-gray-700">
                                                 Got excess baggage? Don't stress, buy extra check-in baggage allowance for DEL-BLR at fab rates!
                                             </div>
@@ -288,7 +270,7 @@ const FlightDetailsPage = () => {
 
                                 {/* Progress Bar */}
                                 <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden mb-4">
-                                    <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-green-500 via-yellow-500 via-orange-500 to-red-500 w-full"></div>
+                                    <div className="absolute left-0 top-0 h-full bg-linear-to-r from-green-500 via-yellow-500 to-red-500 w-full"></div>
                                 </div>
 
                                 {/* Time Slots */}
@@ -384,7 +366,7 @@ const FlightDetailsPage = () => {
                             {isLowSeats && (
                                 <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-4">
                                     <div className="flex items-center gap-2 text-sm">
-                                        <AlertCircle className="w-4 h-4 text-orange-600 flex-shrink-0" />
+                                        <AlertCircle className="w-4 h-4 text-orange-600 shrink-0" />
                                         <span className="font-semibold text-orange-800">
                                             Only {flight.availableSeats} seats left!
                                         </span>
@@ -400,7 +382,7 @@ const FlightDetailsPage = () => {
                                     )
                                 }
                                 disabled={flight.availableSeats === 0}
-                                className="w-full py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg font-bold text-base hover:from-orange-600 hover:to-orange-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full py-4 bg-linear-to-r from-orange-500 to-orange-600 text-white rounded-lg font-bold text-base hover:from-orange-600 hover:to-orange-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 BOOK NOW
                             </button>

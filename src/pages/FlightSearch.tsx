@@ -250,7 +250,7 @@ const FlightSearch: FC<FlightSearchProps> = ({ onSearch }) => {
                     onClick={handleSearch}
                     className="
                         w-full py-4 rounded-xl
-                        bg-gradient-to-r from-blue-600 to-indigo-600
+                        bg-linear-to-r from-blue-600 to-indigo-600
                         text-white font-bold text-lg
                         shadow-xl hover:shadow-2xl
                         hover:from-blue-700 hover:to-indigo-700

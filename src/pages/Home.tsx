@@ -54,8 +54,8 @@ const BADGE_VARIANTS = {
 } as const;
 
 const BUTTON_VARIANTS = {
-    primary: "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/30 disabled:from-blue-400 disabled:to-blue-500",
-    success: "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg shadow-green-500/30 disabled:from-green-400 disabled:to-emerald-400",
+    primary: "bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/30 disabled:from-blue-400 disabled:to-blue-500",
+    success: "bg-linear-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg shadow-green-500/30 disabled:from-green-400 disabled:to-emerald-400",
     outline: "bg-white border-2 border-gray-200 hover:border-blue-500 text-gray-700 hover:text-blue-700 disabled:border-gray-100 disabled:text-gray-400"
 } as const;
 
@@ -358,7 +358,6 @@ const Home = () => {
     const [error, setError] = useState<string>("");
     const [sortBy, setSortBy] = useState<string>("price");
     const [searchMode, setSearchMode] = useState(false);
-    const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [pagination, setPagination] = useState<Pagination>({
         page: 1,
         pages: 1,
@@ -398,8 +397,6 @@ const Home = () => {
             if (!finalParams.origin.trim()) errors.origin = "Origin is required";
             if (!finalParams.destination.trim()) errors.destination = "Destination is required";
             if (!finalParams.travelDate) errors.travelDate = "Date is required";
-
-            setFormErrors(errors);
             if (Object.keys(errors).length > 0) return;
 
             setLoading(true);
@@ -451,7 +448,6 @@ const Home = () => {
             travelDate: new Date().toISOString().split("T")[0],
             passengers: 1
         });
-        setFormErrors({});
         fetchAllFlights();
     }, [fetchAllFlights]);
 
@@ -472,7 +468,7 @@ const Home = () => {
     }, [flights, sortBy]);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
+        <div className="min-h-screen bg-linear-to-br from-gray-50 via-blue-50 to-indigo-50">
             {/* Header */}
             <Header
                 user={user}
@@ -481,7 +477,7 @@ const Home = () => {
             />
 
             {/* Hero */}
-            <section className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 py-12">
+            <section className="bg-linear-to-r from-blue-600 via-blue-700 to-indigo-700 py-12">
                 <div className="max-w-7xl mx-auto px-4 lg:px-8">
                     <FlightSearch onSearch={searchFlights} />
                 </div>
@@ -512,7 +508,7 @@ const Home = () => {
                                 <span className="hidden sm:inline">Reset</span>
                             </Button>
                         )}
-                        <SlidersHorizontal className="w-5 h-5 text-gray-600 flex-shrink-0" />
+                        <SlidersHorizontal className="w-5 h-5 text-gray-600 shrink-0" />
                         <select
                             value={sortBy}
                             onChange={(e) => setSortBy(e.target.value)}
@@ -529,7 +525,7 @@ const Home = () => {
                 {/* Error Message */}
                 {error && (
                     <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 flex items-start gap-3" role="alert">
-                        <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                        <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
                         <div>
                             <p className="font-semibold">Error</p>
                             <p className="text-sm">{error}</p>

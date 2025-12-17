@@ -310,7 +310,7 @@ const BookingConfirmation: FC = () => {
                             </div>
 
                             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 flex items-start gap-2">
-                                <Shield className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                                <Shield className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
                                 <div className="text-sm text-blue-900">
                                     <div className="font-semibold mb-1">Secure Payment</div>
                                     Your payment information is encrypted and secure
@@ -320,7 +320,7 @@ const BookingConfirmation: FC = () => {
                             <button
                                 onClick={handleBooking}
                                 disabled={booking}
-                                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
+                                className="w-full bg-linear-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
                             >
                                 {booking ? (
                                     <>

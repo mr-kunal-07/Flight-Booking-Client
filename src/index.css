@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+.input {
+  @apply bg-transparent w-full font-bold outline-none;
+}
+
+.counter-btn {
+  @apply w-9 h-9 rounded-lg border-2 flex items-center justify-center font-bold;
+}
+
+.swap-btn {
+  @apply absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
+  w-10 h-10 bg-white rounded-full border-2 border-blue-500
+  flex items-center justify-center shadow hover:scale-110 transition;
+}

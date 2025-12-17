@@ -261,7 +261,7 @@ const FlightCard = ({
 
                         <div className="relative w-full max-w-45">
                             <div className="h-0.5 bg-gray-300 rounded-full" />
-                            <Plane className="absolute -top-3 left-1/2 -translate-x-1/2 w-5 h-5 text-blue-500 rotate-90 bg-white px-1" />
+                            <Plane className="absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 text-blue-500 rotate-90  px-1" />
                         </div>
 
                         <span className="mt-2 text-xs font-medium text-green-600">
@@ -468,7 +468,7 @@ const Home = () => {
     }, [flights, sortBy]);
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-gray-50 via-blue-50 to-indigo-50">
+        <div className="min-h-screen bg-white">
             {/* Header */}
             <Header
                 user={user}
@@ -477,7 +477,7 @@ const Home = () => {
             />
 
             {/* Hero */}
-            <section className="bg-linear-to-r from-blue-600 via-blue-700 to-indigo-700 py-12">
+            <section className="bg-linear-to-b from-slate-950 via-blue-900 to-white py-12">
                 <div className="max-w-7xl mx-auto px-4 lg:px-8">
                     <FlightSearch onSearch={searchFlights} />
                 </div>
@@ -589,10 +589,10 @@ const Home = () => {
 
             {/* Footer */}
             <footer className="bg-white border-t border-gray-200 mt-16">
-                <div className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
+                <div className="max-w-7xl mx-auto px-4 lg:px-8 py-3">
                     <div className="text-center">
                         <p className="text-sm text-gray-600">© 2024 FlightBook. All rights reserved.</p>
-                        <p className="text-xs text-gray-500 mt-2">
+                        <p className="text-xs text-gray-500">
                             Need help? Contact <a href="mailto:support@flightbook.com" className="text-blue-600 hover:underline">support@flightbook.com</a>
                         </p>
                     </div>

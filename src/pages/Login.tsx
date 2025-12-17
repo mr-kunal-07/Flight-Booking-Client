@@ -18,7 +18,7 @@ const InputField: FC<InputFieldProps> = ({ icon: Icon, type = "text", placeholde
             placeholder={placeholder}
             value={value}
             onChange={onChange}
-            className="w-full pl-12 pr-4 py-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
         />
     </div>
 );
@@ -82,22 +82,22 @@ const Login: FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center px-4 py-8">
+        <div className="min-h-dvh bg-linear-to-b from-slate-950 via-blue-900 to-white flex items-center justify-center px-4 py-5  ">
             <div className="w-full max-w-md">
                 {/* Back Button */}
                 <button
                     onClick={handleBack}
-                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 transition-colors"
+                    className="flex cursor-pointer items-center gap-2 text-slate-50 hover:text-white mb-3 transition-colors"
                 >
                     <ArrowLeft className="w-5 h-5" />
                     <span className="font-medium">Back</span>
                 </button>
 
                 {/* Login Card */}
-                <div className="bg-white rounded-3xl shadow-xl p-8 sm:p-10 border border-gray-100">
+                <div className="bg-white rounded-xl shadow-xl p-8 sm:p-10 border border-gray-100">
                     {/* Logo & Title */}
                     <div className="text-center mb-8">
-                        <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
                             <Plane className="w-8 h-8 text-white" />
                         </div>
                         <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back</h1>
@@ -106,7 +106,7 @@ const Login: FC = () => {
 
                     {/* Error Message */}
                     {error && (
-                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
                             {error}
                         </div>
                     )}
@@ -144,7 +144,7 @@ const Login: FC = () => {
                         <button
                             onClick={handleLogin}
                             disabled={loading}
-                            className="w-full bg-blue-600 text-white py-3.5 rounded-xl font-semibold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/30 mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full cursor-pointer bg-blue-600 text-white py-3 rounded-md font-semibold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/30 mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? "Signing in..." : "Sign In"}
                         </button>
@@ -162,7 +162,7 @@ const Login: FC = () => {
 
                     {/* Social Login */}
                     <div className="grid grid-cols-2 gap-3">
-                        <button className="flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+                        <button className="flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-md hover:bg-gray-100 cursor-pointer transition-colors">
                             <svg className="w-5 h-5" viewBox="0 0 24 24">
                                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -171,7 +171,7 @@ const Login: FC = () => {
                             </svg>
                             <span className="font-medium text-gray-700">Google</span>
                         </button>
-                        <button className="flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+                        <button className="flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-md hover:bg-gray-100 cursor-pointer transition-colors">
                             <svg className="w-5 h-5" fill="#1877F2" viewBox="0 0 24 24">
                                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                             </svg>
@@ -184,7 +184,7 @@ const Login: FC = () => {
                         Don't have an account?{" "}
                         <button
                             onClick={() => navigate("/register")}
-                            className="text-blue-600 hover:text-blue-700 font-semibold"
+                            className="text-blue-600 hover:text-blue-700 font-semibold cursor-pointer"
                         >
                             Sign up
                         </button>

@@ -1,19 +1,6 @@
+import { ArrowLeft } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-    Plane,
-    Users,
-    Clock,
-    MapPin,
-    ArrowRight,
-    Loader2,
-    FileText,
-    CheckCircle,
-    XCircle,
-    AlertCircle,
-    ChevronRight,
-    Download
-} from "lucide-react";
 
 interface Passenger {
     id: string;
@@ -48,75 +35,119 @@ interface Booking {
     passengers: Passenger[];
 }
 
+interface ApiResponse {
+    success: boolean;
+    data: Booking[];
+    message?: string;
+}
+
 const BookingHistory = () => {
     const navigate = useNavigate();
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [error, setError] = useState<string | null>(null);
     const [filter, setFilter] = useState<"all" | "confirmed" | "cancelled">("all");
+
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
     useEffect(() => {
         fetchBookings();
     }, []);
-    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
     const fetchBookings = async () => {
         try {
+            setLoading(true);
+            setError(null);
+
+            const token = localStorage.getItem("token");
+            if (!token) {
+                navigate("/login");
+                return;
+            }
+
             const response = await fetch(`${apiUrl}/api/bookings/user/history`, {
+                method: "GET",
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
                 },
             });
 
+            if (!response.ok) {
+                if (response.status === 401) {
+                    localStorage.removeItem("token");
+                    navigate("/login");
+                    return;
+                }
+                throw new Error(`Failed to fetch: ${response.statusText}`);
+            }
 
-            const data = await response.json();
+            const data: ApiResponse = await response.json();
 
-            if (response.ok) {
+            if (data.success) {
                 setBookings(data.data || []);
             } else {
-                setError(data.message || "Failed to fetch bookings");
+                setError(data.message || "Failed to load bookings");
             }
         } catch (err) {
-            setError("Network error. Please try again.");
+            const errorMessage = err instanceof Error ? err.message : "Network error occurred";
             console.error("Error fetching bookings:", err);
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
     };
 
     const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString("en-IN", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-        });
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString("en-IN", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+            });
+        } catch {
+            return dateString;
+        }
     };
 
     const formatTime = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleTimeString("en-IN", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-        });
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleTimeString("en-IN", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+            });
+        } catch {
+            return dateString;
+        }
+    };
+
+    const formatDuration = (minutes: number | string) => {
+        const mins = typeof minutes === "string" ? parseInt(minutes) : minutes;
+        const h = Math.floor(mins / 60);
+        const m = mins % 60;
+        return h > 0 ? `${h}h ${m}m` : `${m}m`;
     };
 
     const getStatusIcon = (status: string) => {
-        switch (status.toUpperCase()) {
+        const statusUpper = status.toUpperCase();
+        switch (statusUpper) {
             case "CONFIRMED":
-                return <CheckCircle className="w-5 h-5 text-green-600" />;
+                return "✓";
             case "CANCELLED":
-                return <XCircle className="w-5 h-5 text-red-600" />;
+                return "✕";
             case "PENDING":
-                return <AlertCircle className="w-5 h-5 text-yellow-600" />;
+                return "!";
             default:
-                return <FileText className="w-5 h-5 text-gray-600" />;
+                return "📄";
         }
     };
 
     const getStatusColor = (status: string) => {
-        switch (status.toUpperCase()) {
+        const statusUpper = status.toUpperCase();
+        switch (statusUpper) {
             case "CONFIRMED":
                 return "bg-green-100 text-green-800 border-green-200";
             case "CANCELLED":
@@ -133,11 +164,15 @@ const BookingHistory = () => {
         return booking.status.toLowerCase() === filter;
     });
 
+    const confirmedCount = bookings.filter((b) => b.status.toLowerCase() === "confirmed").length;
+    const cancelledCount = bookings.filter((b) => b.status.toLowerCase() === "cancelled").length;
+
+    // Loading State
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
                 <div className="text-center">
-                    <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+                    <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
                     <p className="text-gray-600 font-medium">Loading your bookings...</p>
                 </div>
             </div>
@@ -145,21 +180,26 @@ const BookingHistory = () => {
     }
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 py-6 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 py-4 sm:py-6 px-3 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-                        My Bookings
-                    </h1>
-                    <p className="text-gray-600">View and manage all your flight bookings</p>
+                <div className="mb-6 sm:mb-8">
+                    <div className="flex items-center gap-3 pb-2 border-b border-gray-300">
+                        <ArrowLeft
+                            onClick={() => navigate(-1)}
+                            className="w-6 h-6 text-gray-600 cursor-pointer"
+                        />
+                        <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold text-gray-900 ">
+                            My Bookings
+                        </h1>
+                    </div>
                 </div>
 
-                {/* Filter Tabs */}
-                <div className="flex flex-wrap gap-2 mb-6">
+                {/* Filter Tabs - Responsive */}
+                <div className="flex flex-wrap gap-2 sm:gap-3 mb-4 sm:mb-8">
                     <button
                         onClick={() => setFilter("all")}
-                        className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-all ${filter === "all"
+                        className={`px-3 sm:px-6 py-2 rounded-md font-semibold transition-all text-sm sm:text-base min-h-11 flex items-center ${filter === "all"
                             ? "bg-blue-600 text-white shadow-lg"
                             : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
                             }`}
@@ -168,107 +208,124 @@ const BookingHistory = () => {
                     </button>
                     <button
                         onClick={() => setFilter("confirmed")}
-                        className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-all ${filter === "confirmed"
+                        className={`px-3 sm:px-6 py-2 rounded-md font-semibold transition-all text-sm sm:text-base min-h-11 flex items-center ${filter === "confirmed"
                             ? "bg-green-600 text-white shadow-lg"
                             : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
                             }`}
                     >
-                        Confirmed ({bookings.filter((b) => b.status.toLowerCase() === "confirmed").length})
+                        Confirmed ({confirmedCount})
                     </button>
                     <button
                         onClick={() => setFilter("cancelled")}
-                        className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-all ${filter === "cancelled"
+                        className={`px-3 sm:px-6 py-2 rounded-md font-semibold transition-all text-sm sm:text-base min-h-11 flex items-center ${filter === "cancelled"
                             ? "bg-red-600 text-white shadow-lg"
                             : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
                             }`}
                     >
-                        Cancelled ({bookings.filter((b) => b.status.toLowerCase() === "cancelled").length})
+                        Cancelled ({cancelledCount})
                     </button>
                 </div>
 
                 {/* Error Message */}
                 {error && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                        <p className="text-red-800 font-medium">{error}</p>
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 mb-6">
+                        <div className="flex items-center gap-2">
+                            <span className="text-red-600 text-lg">⚠️</span>
+                            <p className="text-xs sm:text-sm text-red-800 font-medium">{error}</p>
+                        </div>
                     </div>
                 )}
 
                 {/* Bookings List */}
                 {filteredBookings.length === 0 ? (
-                    <div className="bg-white rounded-2xl p-8 sm:p-12 text-center border border-gray-200">
-                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <FileText className="w-10 h-10 text-gray-400" />
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">No bookings found</h3>
-                        <p className="text-gray-600 mb-6">
+                    <div className="bg-white rounded-xl sm:rounded-2xl p-6 sm:p-8 lg:p-12 text-center border border-gray-200">
+                        <div className="text-4xl mb-4">📄</div>
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
+                            No bookings found
+                        </h3>
+                        <p className="text-xs sm:text-sm text-gray-600 mb-6">
                             {filter === "all"
                                 ? "You haven't made any bookings yet."
                                 : `No ${filter} bookings found.`}
                         </p>
                         <button
                             onClick={() => navigate("/home")}
-                            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                            className="bg-blue-600 text-white px-6 py-3 min-h-11 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm sm:text-base"
                         >
                             Search Flights
                         </button>
                     </div>
                 ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                         {filteredBookings.map((booking) => (
                             <div
                                 key={booking.id}
-                                className="bg-white rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-xl transition-all duration-300 overflow-hidden"
+                                className="bg-white rounded-lg sm:rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300 overflow-hidden"
                             >
-                                <div className="p-4 sm:p-6">
+                                <div className="p-3 sm:p-4 lg:p-6">
                                     {/* Booking Header */}
-                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 pb-4 border-b border-gray-100">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-12 h-12 bg-linear-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shrink-0">
-                                                <Plane className="w-6 h-6 text-white" />
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-4 pb-4 border-b border-gray-100">
+                                        <div className="flex items-center gap-2 sm:gap-3">
+                                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-linear-to-br from-blue-500 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
+                                                <span className="text-white text-lg sm:text-xl">✈️</span>
                                             </div>
-                                            <div>
-                                                <div className="font-bold text-lg text-gray-900">
+                                            <div className="min-w-0">
+                                                <div className="font-bold text-sm sm:text-lg text-gray-900 truncate">
                                                     {booking.bookingReference}
                                                 </div>
-                                                <div className="text-sm text-gray-600">
+                                                <div className="text-xs sm:text-sm text-gray-600">
                                                     Booked on {formatDate(booking.createdAt)}
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className={`px-4 py-2 rounded-full border font-semibold text-sm flex items-center gap-2 w-fit ${getStatusColor(booking.status)}`}>
-                                            {getStatusIcon(booking.status)}
+                                        <div
+                                            className={`px-3 sm:px-4 py-2 rounded-full border font-semibold text-xs sm:text-sm flex items-center gap-2 shrink-0 ${getStatusColor(
+                                                booking.status
+                                            )}`}
+                                        >
+                                            <span className="text-base">{getStatusIcon(booking.status)}</span>
                                             {booking.status}
                                         </div>
                                     </div>
 
-                                    {/* Flight Details */}
-                                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4">
+                                    {/* Flight Details - Responsive Grid */}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4 mb-4 pb-4 border-b border-gray-100">
                                         {/* Airline */}
-                                        <div className="lg:col-span-3 flex items-center gap-3">
-                                            <div className="w-14 h-14 bg-white border border-gray-200 rounded-xl flex items-center justify-center p-2 shrink-0">
+                                        <div className="sm:col-span-2 lg:col-span-3 flex items-center gap-2 sm:gap-3">
+                                            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white border border-gray-200 rounded-lg sm:rounded-xl flex items-center justify-center p-2 shrink-0">
                                                 <img
                                                     src={booking.flight.airlineLogo}
                                                     alt={booking.flight.airline}
                                                     className="w-full h-full object-contain"
+                                                    loading="lazy"
+                                                    onError={(e) => {
+                                                        (e.target as HTMLImageElement).src =
+                                                            "https://via.placeholder.com/50?text=Airline";
+                                                    }}
                                                 />
                                             </div>
-                                            <div>
-                                                <div className="font-bold text-gray-900">{booking.flight.airline}</div>
-                                                <div className="text-sm text-gray-600">{booking.flight.flightNumber}</div>
+                                            <div className="min-w-0">
+                                                <div className="font-bold text-sm sm:text-base text-gray-900 truncate">
+                                                    {booking.flight.airline}
+                                                </div>
+                                                <div className="text-xs text-gray-600">
+                                                    {booking.flight.flightNumber}
+                                                </div>
                                             </div>
                                         </div>
 
                                         {/* Route */}
-                                        <div className="lg:col-span-6">
-                                            <div className="flex items-center gap-3">
-                                                <div className="flex-1">
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <MapPin className="w-4 h-4 text-gray-400" />
-                                                        <div className="font-bold text-xl text-gray-900">
+                                        <div className="sm:col-span-2 lg:col-span-6">
+                                            <div className="flex items-center gap-1 sm:gap-3">
+                                                {/* Departure */}
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-1 mb-0.5 sm:mb-1">
+                                                        <span className="text-gray-400 text-xs hidden sm:inline">📍</span>
+                                                        <div className="font-bold text-lg sm:text-xl text-gray-900">
                                                             {booking.flight.origin}
                                                         </div>
                                                     </div>
-                                                    <div className="text-sm text-gray-600">
+                                                    <div className="text-xs text-gray-600">
                                                         {formatTime(booking.flight.departureTime)}
                                                     </div>
                                                     <div className="text-xs text-gray-500">
@@ -276,22 +333,24 @@ const BookingHistory = () => {
                                                     </div>
                                                 </div>
 
-                                                <div className="flex flex-col items-center px-2">
-                                                    <Clock className="w-4 h-4 text-gray-400 mb-1" />
-                                                    <ArrowRight className="w-8 h-8 text-blue-600" />
-                                                    <div className="text-xs text-gray-500 mt-1">
-                                                        {booking.flight.duration}h
+                                                {/* Duration */}
+                                                <div className="flex flex-col items-center px-1 sm:px-2">
+                                                    <span className="text-gray-400 text-xs hidden sm:inline">⏱️</span>
+                                                    <span className="text-blue-600 text-sm sm:text-lg">→</span>
+                                                    <div className="text-xs text-gray-500 mt-0.5 sm:mt-1">
+                                                        {formatDuration(booking.flight.duration)}
                                                     </div>
                                                 </div>
 
-                                                <div className="flex-1 text-right">
-                                                    <div className="flex items-center justify-end gap-2 mb-1">
-                                                        <div className="font-bold text-xl text-gray-900">
+                                                {/* Arrival */}
+                                                <div className="flex-1 text-right min-w-0">
+                                                    <div className="flex items-center justify-end gap-1 mb-0.5 sm:mb-1">
+                                                        <div className="font-bold text-lg sm:text-xl text-gray-900">
                                                             {booking.flight.destination}
                                                         </div>
-                                                        <MapPin className="w-4 h-4 text-gray-400" />
+                                                        <span className="text-gray-400 text-xs hidden sm:inline">📍</span>
                                                     </div>
-                                                    <div className="text-sm text-gray-600">
+                                                    <div className="text-xs text-gray-600">
                                                         {formatTime(booking.flight.arrivalTime)}
                                                     </div>
                                                     <div className="text-xs text-gray-500">
@@ -302,19 +361,19 @@ const BookingHistory = () => {
                                         </div>
 
                                         {/* Price */}
-                                        <div className="lg:col-span-3 flex flex-col items-start lg:items-end justify-center">
-                                            <div className="text-sm text-gray-600 mb-1">Total Amount</div>
-                                            <div className="text-2xl font-bold text-blue-600">
+                                        <div className="sm:col-span-2 lg:col-span-3 flex flex-col items-start sm:items-end justify-center">
+                                            <div className="text-xs text-gray-600 mb-1">Total Amount</div>
+                                            <div className="text-xl sm:text-2xl font-bold text-blue-600">
                                                 ₹{parseFloat(booking.totalAmount).toLocaleString("en-IN")}
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* Passengers */}
-                                    <div className="bg-gray-50 rounded-xl p-4 mb-4">
+                                    <div className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4 mb-4">
                                         <div className="flex items-center gap-2 mb-3">
-                                            <Users className="w-5 h-5 text-gray-600" />
-                                            <span className="font-semibold text-gray-900">
+                                            <span className="text-lg">👥</span>
+                                            <span className="font-semibold text-sm sm:text-base text-gray-900">
                                                 Passengers ({booking.numberOfPassengers})
                                             </span>
                                         </div>
@@ -322,12 +381,12 @@ const BookingHistory = () => {
                                             {booking.passengers.map((passenger) => (
                                                 <div
                                                     key={passenger.id}
-                                                    className="bg-white rounded-lg px-3 py-2 border border-gray-200"
+                                                    className="bg-white rounded-lg px-3 py-2 border border-gray-200 text-sm"
                                                 >
                                                     <div className="font-medium text-gray-900">
                                                         {passenger.firstName} {passenger.lastName}
                                                     </div>
-                                                    <div className="text-sm text-gray-600">
+                                                    <div className="text-xs text-gray-600">
                                                         {passenger.gender} • {passenger.age} years
                                                     </div>
                                                 </div>
@@ -336,18 +395,19 @@ const BookingHistory = () => {
                                     </div>
 
                                     {/* Action Buttons */}
-                                    <div className="flex flex-col sm:flex-row gap-3">
+                                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                                         <button
                                             onClick={() => navigate(`/booking/${booking.id}`)}
-                                            className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                                            className="flex-1 bg-blue-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base min-h-11"
                                         >
                                             View Details
-                                            <ChevronRight className="w-5 h-5" />
+                                            <span>→</span>
                                         </button>
                                         <button
-                                            className="sm:w-auto bg-white text-blue-600 px-6 py-3 rounded-xl font-semibold border-2 border-blue-600 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
+                                            className="sm:flex-1 lg:flex-none bg-white text-blue-600 px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold border-2 border-blue-600 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base min-h-11"
+                                            aria-label="Download booking details"
                                         >
-                                            <Download className="w-5 h-5" />
+                                            <span>⬇️</span>
                                             <span className="hidden sm:inline">Download</span>
                                         </button>
                                     </div>

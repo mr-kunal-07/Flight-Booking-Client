@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Plane, Loader2, Clock, Users, Shield, Wifi, Eye, AlertCircle, SlidersHorizontal, RefreshCw } from "lucide-react";
+import { Plane, Loader2, AlertCircle, SlidersHorizontal, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getUser, logout } from "../utils/auth";
 import FlightSearch from "./FlightSearch";
@@ -45,13 +45,6 @@ const SORT_OPTIONS = [
     { value: "duration", label: "Shortest Duration" }
 ] as const;
 
-const BADGE_VARIANTS = {
-    default: "bg-gray-100 text-gray-700",
-    success: "bg-green-50 text-green-700",
-    warning: "bg-orange-50 text-orange-700",
-    info: "bg-blue-50 text-blue-700",
-    purple: "bg-purple-50 text-purple-700"
-} as const;
 
 const BUTTON_VARIANTS = {
     primary: "bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/30 disabled:from-blue-400 disabled:to-blue-500",
@@ -127,21 +120,7 @@ const formatPrice = (price: string | number): string => {
     }
 };
 
-// ==================== REUSABLE COMPONENTS ====================
-const Badge = ({
-    icon: Icon,
-    children,
-    variant = "default"
-}: {
-    icon?: any;
-    children: React.ReactNode;
-    variant?: keyof typeof BADGE_VARIANTS;
-}) => (
-    <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold ${BADGE_VARIANTS[variant]}`}>
-        {Icon && <Icon className="w-3.5 h-3.5" />}
-        {children}
-    </div>
-);
+
 
 
 
@@ -185,129 +164,134 @@ const FlightCard = ({
     const isSoldOut = flight.availableSeats === 0;
 
     return (
-        <article
-            className="
-    bg-white rounded-2xl border border-gray-200
-    hover:shadow-2xl hover:border-blue-300
-    transition-all duration-300
-    overflow-hidden group
-  "
-            aria-label={`Flight ${flight.flightNumber} from ${flight.origin} to ${flight.destination}`}
+        <div
+            className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-xl transition-all duration-300 overflow-hidden"
+            role="article"
         >
             {/* Status Bar */}
             {isSoldOut ? (
-                <div className="bg-gray-800 text-white px-5 py-2 text-sm font-medium flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4" />
+                <div className="bg-gray-800 text-white px-4 sm:px-6 py-2 text-xs sm:text-sm font-semibold flex items-center gap-2">
+                    <span>⛔</span>
                     Sold Out
                 </div>
             ) : isLowSeats ? (
-                <div className="bg-orange-50 text-orange-700 px-5 py-2 text-sm font-medium flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4" />
+                <div className="bg-orange-50 text-orange-700 px-4 sm:px-6 py-2 text-xs sm:text-sm font-semibold flex items-center gap-2">
+                    <span>⚠️</span>
                     Only {flight.availableSeats} seats left
                 </div>
             ) : null}
 
-            <div className="p-6">
-                {/* Header */}
-                <div className="flex items-center justify-between gap-4 mb-6">
-                    <div className="flex items-center gap-4 min-w-0">
-                        <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
+            <div className="p-4 sm:p-6">
+                {/* Airline Header - Mobile View */}
+                <div className="flex items-center justify-between gap-3 mb-4 sm:mb-6">
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gray-100 flex items-center justify-center shrink-0">
                             <img
                                 src={flight.airlineLogo}
-                                alt={`${flight.airline} logo`}
-                                className="w-8 h-8 object-contain scale-200"
+                                alt={flight.airline}
+                                className="w-8 h-8 object-contain"
+                                loading="lazy"
                                 onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                        flight.airline
-                                    )}&background=3b82f6&color=fff&size=64`;
+                                    (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(flight.airline)}&background=3b82f6&color=fff&size=64`;
                                 }}
                             />
                         </div>
-
                         <div className="min-w-0">
-                            <h3 className="text-base font-semibold text-gray-900 truncate">
+                            <h3 className="text-sm sm:text-base font-semibold text-gray-900 truncate">
                                 {flight.airline}
                             </h3>
                             <p className="text-xs text-gray-500">{flight.flightNumber}</p>
                         </div>
                     </div>
 
-                    <div className="text-right">
-                        <div className="text-2xl font-bold text-gray-900">
+                    {/* Price */}
+                    <div className="text-right shrink-0">
+                        <div className="text-xl sm:text-2xl font-bold text-gray-900">
                             ₹{formatPrice(flight.price)}
                         </div>
-                        <p className="text-xs text-gray-500">per traveller</p>
+                        <p className="text-xs text-gray-500 hidden sm:block">per traveller</p>
                     </div>
                 </div>
 
-                {/* Timeline */}
-                <div className="flex items-center justify-between mb-6">
-                    <div>
-                        <time className="text-2xl font-semibold text-gray-900">
+                {/* Main Content - Desktop: Horizontal, Mobile: Stacked */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
+                    {/* Departure */}
+                    <div className="sm:flex-1">
+                        <div className="text-2xl sm:text-3xl font-bold text-gray-900">
                             {formatTime(flight.departureTime)}
-                        </time>
-                        <p className="text-sm font-medium text-gray-700">{flight.origin}</p>
+                        </div>
+                        <p className="text-sm sm:text-base font-semibold text-gray-700 mt-1">
+                            {flight.origin}
+                        </p>
                         <p className="text-xs text-gray-500">
                             {formatDate(flight.departureTime)}
                         </p>
                     </div>
 
-                    <div className="flex flex-col items-center flex-1 px-4">
-                        <span className="text-xs text-gray-500 mb-2 flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
+                    {/* Duration - Desktop Only, Mobile Shows Below */}
+                    <div className="hidden sm:flex flex-col items-center sm:flex-1 px-4">
+                        <span className="text-xs text-gray-500 mb-2">
                             {formatDuration(flight.duration)}
                         </span>
-
-                        <div className="relative w-full max-w-45">
+                        <div className="relative w-full">
                             <div className="h-0.5 bg-gray-300 rounded-full" />
-                            <Plane className="absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 text-blue-500 rotate-90  px-1" />
+                            <div className="absolute left-1/2 -translate-x-1/2 -top-3">
+                                <span className="text-lg">✈️</span>
+                            </div>
                         </div>
-
-                        <span className="mt-2 text-xs font-medium text-green-600">
-                            Non-stop
+                        <span className="mt-2 text-xs font-semibold text-green-600">
+                            Non Stop
                         </span>
                     </div>
 
-                    <div className="text-right">
-                        <time className="text-2xl font-semibold text-gray-900">
+                    {/* Arrival */}
+                    <div className="sm:flex-1 sm:text-right">
+                        <div className="text-2xl sm:text-3xl font-bold text-gray-900">
                             {formatTime(flight.arrivalTime)}
-                        </time>
-                        <p className="text-sm font-medium text-gray-700">{flight.destination}</p>
+                        </div>
+                        <p className="text-sm sm:text-base font-semibold text-gray-700 mt-1">
+                            {flight.destination}
+                        </p>
                         <p className="text-xs text-gray-500">
                             {formatDate(flight.arrivalTime)}
                         </p>
                     </div>
                 </div>
 
-                {/* Amenities */}
-                <div className="flex flex-wrap gap-2 mb-6">
-                    <Badge icon={Users} >
-                        {flight.availableSeats} seats
-                    </Badge>
-                    <Badge icon={Shield} >
-                        Refundable
-                    </Badge>
-                    <Badge icon={Wifi} >
-                        Wi-Fi
-                    </Badge>
-                </div >
+                {/* Mobile Duration Badge */}
+                <div className="flex sm:hidden items-center justify-center gap-2 mt-4 mb-4 text-xs text-gray-600 bg-gray-50 rounded-lg p-2">
+                    <span className="text-sm">✈️</span>
+                    {formatDuration(flight.duration)} • Non Stop
+                </div>
 
-                {/* Action */}
-                <Button
-                    icon={Eye}
+                {/* Amenities & Seats - Mobile Compact, Desktop Full */}
+                <div className="flex flex-wrap gap-2 mb-4 sm:mb-6">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-blue-50 text-blue-700">
+                        <span>👥</span>
+                        {flight.availableSeats} seats
+                    </div>
+                    <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-green-50 text-green-700">
+                        <span>✓</span>
+                        Refundable
+                    </div>
+                    <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-purple-50 text-purple-700">
+                        <span>📶</span>
+                        Wi-Fi
+                    </div>
+                </div>
+
+                {/* View Details Button */}
+                <button
                     onClick={() => onViewDetails(flight.id)}
-                    className="w-full rounded-xl"
+                    disabled={isSoldOut}
+                    className="w-full py-3 sm:py-3 px-4 bg-blue-600 text-white rounded-lg sm:rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed min-h-11 flex items-center justify-center text-sm sm:text-base"
                 >
                     View Details
-                </Button>
-
-            </div >
-        </article >
-
+                </button>
+            </div>
+        </div>
     );
 };
-
 
 // ==================== PAGINATION ====================
 const PaginationControls = ({
@@ -429,7 +413,7 @@ const Home = () => {
     // Handlers
     const handleLogout = useCallback(() => {
         logout();
-        navigate("/login");
+        navigate("/");
     }, [navigate]);
 
     const handleViewDetails = useCallback((id: string) => {

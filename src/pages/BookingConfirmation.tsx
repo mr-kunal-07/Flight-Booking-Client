@@ -120,7 +120,7 @@ const BookingConfirmation: FC = () => {
             console.log('Booking Response:', data);
 
             if (response.ok) {
-                navigate(`/booking-success/${data.data.id}`); // Changed from data.data.booking.id
+                navigate(`/my-bookings`);
             } else {
                 // Show the actual error message
                 alert(`Booking failed: ${data.message}\n${data.details || ''}`);

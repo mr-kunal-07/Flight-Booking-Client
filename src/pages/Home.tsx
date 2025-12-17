@@ -60,7 +60,7 @@ const BUTTON_VARIANTS = {
 } as const;
 
 // ==================== API SERVICE ====================
-const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const apiUrl = import.meta.env.VITE_API_URL
 const flightAPI = {
     getAll: async (page = 1, limit = 10) => {
         const response = await fetch(
